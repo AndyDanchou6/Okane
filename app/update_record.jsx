@@ -6,19 +6,71 @@ import {
   useColorScheme,
   TouchableOpacity,
 } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { useFocusEffect, useLocalSearchParams, router } from "expo-router";
 import { Colors } from "../constants/Colors";
+import { useCallback, useEffect, useState } from "react";
+import { LoadRecords, SaveRecords } from "../Utility/Record";
 
 const UpdateRecord = () => {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme] ?? Colors.light;
 
-  const { record } = useLocalSearchParams();
-  const parsedRecord = JSON.parse(record);
+  const params = useLocalSearchParams();
+  const parsedRecord = JSON.parse(params.record);
   const category = capitalizeFirst(parsedRecord.category);
 
-  const handleUpdate = () => {};
-  const handleDelete = () => {};
+  const [getRecords, setGetRecords] = useState([]);
+  const [amountInput, setAmountInput] = useState(null);
+  const [descriptionInput, setDescriptionInput] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      const data = await LoadRecords();
+      setGetRecords(data);
+    };
+
+    load();
+  }, [params.id, params.record]);
+
+  const saveAndUpdateRecords = async (updatedRecords, operation) => {
+    const response = await SaveRecords(updatedRecords);
+
+    if (response) {
+      setGetRecords(updatedRecords);
+      setAmountInput(null);
+      setDescriptionInput(null);
+
+      if (operation === "delete") alert("Record Deleted");
+      if (operation === "update") alert("Record Updated");
+
+      router.push({
+        pathname: "/",
+      });
+    } else {
+      alert("Record not deleted");
+    }
+  };
+
+  const handleUpdate = () => {
+    const index = parseInt(params.id);
+    let newRecord = [...getRecords];
+
+    newRecord[index] = {
+      ...newRecord[index],
+      ...(amountInput && { amount: amountInput }),
+      ...(descriptionInput && { description: descriptionInput }),
+    };
+
+    saveAndUpdateRecords(newRecord, "update");
+  };
+
+  const handleDelete = () => {
+    const recordCopy = [...getRecords];
+    const index = parseInt(params.id);
+
+    recordCopy.splice(index, 1);
+    saveAndUpdateRecords(recordCopy, "delete");
+  };
 
   return (
     <View style={[styles.main, { backgroundColor: theme.background }]}>
@@ -41,6 +93,8 @@ const UpdateRecord = () => {
           style={[styles.input, { backgroundColor: theme.input }]}
           placeholder={parsedRecord.amount}
           keyboardType="numeric"
+          value={amountInput}
+          onChangeText={setAmountInput}
         />
       </View>
       <View style={[styles.section]}>
@@ -48,6 +102,8 @@ const UpdateRecord = () => {
         <TextInput
           style={[styles.input, { backgroundColor: theme.input }]}
           placeholder={parsedRecord.description}
+          value={descriptionInput}
+          onChangeText={setDescriptionInput}
         />
       </View>
       <View style={[styles.buttonSection]}>

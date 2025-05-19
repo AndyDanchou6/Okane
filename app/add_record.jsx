@@ -11,13 +11,13 @@ import { Colors } from "../constants/Colors";
 import Category from "../components/Category";
 import { Expense } from "../constants/Expense";
 import { Income } from "../constants/Income";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "expo-router";
 import { useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { LoadRecords, SaveRecords } from "../Utility/Record";
 
 const expenseCategories = Expense;
 const incomeCategories = Income;
-const STORAGE_KEY = "records";
 
 const AddRecord = () => {
   const colorScheme = useColorScheme();
@@ -49,34 +49,23 @@ const AddRecord = () => {
     );
   };
 
-  const loadRecords = async () => {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      if (data) setRecords(JSON.parse(data));
-    } catch (e) {
-      console.error("Failed to load items.", e);
-    }
-  };
-
-  const saveRecord = async (recordList) => {
-    try {
-      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(recordList));
-      alert("Record Saved");
-    } catch (e) {
-      console.error("Failed to save items.", e);
-    }
-  };
-
-  const addRecord = () => {
+  const addRecord = async () => {
     let newRecord = {
       icon: selectedCategory.icon,
+      iconIndex: selectedCategory.iconIndex,
       description: descriptionValue ?? "N/A",
       category: selectedCategory.category,
       amount: amountValue,
     };
     let newRecords = [...records, newRecord];
-    saveRecord(newRecords);
-    setRecords(newRecords);
+    const response = await SaveRecords(newRecords);
+
+    if (response) {
+      setRecords(newRecords);
+      alert("Success");
+    } else {
+      alert("Error saving data");
+    }
   };
 
   const handleSubmit = () => {
@@ -91,9 +80,16 @@ const AddRecord = () => {
     }
   };
 
-  useEffect(() => {
-    loadRecords();
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      const load = async () => {
+        const data = await LoadRecords();
+        setRecords(data);
+      };
+
+      load();
+    }, [])
+  );
 
   return (
     <View style={styles.main}>
@@ -108,6 +104,7 @@ const AddRecord = () => {
             <Category
               key={index}
               name={item.name}
+              iconIndex={index}
               icon={item.icon}
               onPress={() => handleCategorySelect(item)}
               isSelected={checkIfSelectedCategory(item)}
@@ -123,6 +120,7 @@ const AddRecord = () => {
             <Category
               key={index}
               name={item.name}
+              iconIndex={index}
               icon={item.icon}
               onPress={() => handleCategorySelect(item)}
               isSelected={checkIfSelectedCategory(item)}
@@ -143,13 +141,16 @@ const AddRecord = () => {
           <TextInput
             style={[
               styles.amountDescription,
-              { backgroundColor: theme.input, color: theme.text_inverted },
+              { backgroundColor: theme.input, color: theme.text },
             ]}
             placeholder="Description"
             onChangeText={setDescriptionValue}
           />
           <TouchableOpacity
-            style={[styles.submitButton, { backgroundColor: theme.buttonColor }]}
+            style={[
+              styles.submitButton,
+              { backgroundColor: theme.buttonColor },
+            ]}
             onPress={handleSubmit}
           >
             <Text style={[{ color: theme.buttonText }]}>Add</Text>

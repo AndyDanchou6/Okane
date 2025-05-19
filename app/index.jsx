@@ -7,36 +7,26 @@ import {
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import Entry from "../components/Entry";
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import { router } from "expo-router";
+import { LoadRecords, SaveRecords } from "../Utility/Record";
 
 const Home = () => {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme] ?? Colors.light;
 
-  const STORAGE_KEY = "records";
   const [records, setRecords] = useState([]);
   const [expenses, setExpenses] = useState(0);
   const [budget, setBudget] = useState(0);
   const [balance, setBalance] = useState(0);
   const [isNegativeBalance, setIsNegativeBalance] = useState(false);
-  const [isRecordPressed, setIsRecordPressed] = useState(false);
-  const [selectedRecord, setSelectedRecord] = useState([]);
 
   const loadRecords = async () => {
-    try {
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      if (data) {
-        let parsed = JSON.parse(data);
-        setRecords(parsed);
-        compute(parsed);
-      }
-    } catch (e) {
-      console.error("Failed to load items.", e);
-      alert("Failed to load records. Please restart the app.");
-    }
+    const data = await LoadRecords();
+
+    setRecords(data);
+    compute(data);
   };
 
   const compute = (recordLists) => {
@@ -61,24 +51,18 @@ const Home = () => {
     setBalance(balance);
   };
 
-  const handleRecordPress = (pressed) => {
-    setIsRecordPressed(true);
-    setSelectedRecord(pressed);
-
+  const handleRecordPress = (pressed, index) => {
     router.push({
       pathname: "update_record",
-      params: { record: JSON.stringify(pressed) },
+      params: { record: JSON.stringify(pressed), id: index },
     });
   };
 
-  useFocusEffect(() => {
-    loadRecords();
-  });
-
-  // debug
-  useEffect(() => {
-    console.log(isRecordPressed, selectedRecord);
-  }, [isRecordPressed, selectedRecord]);
+  useFocusEffect(
+    useCallback(() => {
+      loadRecords();
+    }, [])
+  );
 
   return (
     <View style={[styles.main, { backgroundColor: theme.background }]}>
@@ -112,7 +96,7 @@ const Home = () => {
             icon={record.icon}
             amount={record.amount}
             category={record.category}
-            onPress={() => handleRecordPress(record)}
+            onPress={() => handleRecordPress(record, index)}
           />
         ))}
       </ScrollView>
