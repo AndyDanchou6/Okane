@@ -1,18 +1,18 @@
 import { StyleSheet, Text, View, useColorScheme } from 'react-native'
 import { Colors } from '../constants/Colors'
 
-const Accounts = () => {
+const Settings = () => {
   const colorScheme = useColorScheme()
   const theme = Colors[colorScheme] ?? Colors['light']
 
   return (
     <View style={[styles.main, {backgroundColor: theme.background}]}>
-      <Text>Accounts</Text>
+      <Text>Settings</Text>
     </View>
   )
 }
 
-export default Accounts
+export default Settings
 
 const styles = StyleSheet.create({
   main: {

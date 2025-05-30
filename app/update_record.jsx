@@ -88,20 +88,30 @@ const UpdateRecord = () => {
         {category}
       </Text>
       <View style={[styles.section]}>
-        <Text style={[styles.inputText]}>Amount</Text>
+        <Text style={[styles.inputText, { color: theme.text }]}>Amount</Text>
         <TextInput
-          style={[styles.input, { backgroundColor: theme.input }]}
+          style={[
+            styles.input,
+            { backgroundColor: Colors.white, color: Colors.black },
+          ]}
           placeholder={parsedRecord.amount}
+          placeholderTextColor={Colors.black}
           keyboardType="numeric"
           value={amountInput}
           onChangeText={setAmountInput}
         />
       </View>
       <View style={[styles.section]}>
-        <Text style={[styles.inputText]}>Description</Text>
+        <Text style={[styles.inputText, { color: theme.text }]}>
+          Description
+        </Text>
         <TextInput
-          style={[styles.input, { backgroundColor: theme.input }]}
+          style={[
+            styles.input,
+            { backgroundColor: Colors.white, color: Colors.black },
+          ]}
           placeholder={parsedRecord.description}
+          placeholderTextColor={Colors.black}
           value={descriptionInput}
           onChangeText={setDescriptionInput}
         />

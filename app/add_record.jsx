@@ -6,6 +6,10 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Colors } from "../constants/Colors";
 import Category from "../components/Category";
@@ -92,72 +96,85 @@ const AddRecord = () => {
   );
 
   return (
-    <View style={styles.main}>
-      <ScrollView
-        style={[styles.categories, { backgroundColor: theme.background }]}
-      >
-        <Text style={[styles.sectionTitle, { color: theme.title }]}>
-          Expense Categories
-        </Text>
-        <View style={styles.categorySection}>
-          {expenseCategories.map((item, index) => (
-            <Category
-              key={index}
-              name={item.name}
-              iconIndex={index}
-              icon={item.icon}
-              onPress={() => handleCategorySelect(item)}
-              isSelected={checkIfSelectedCategory(item)}
-            />
-          ))}
-        </View>
-
-        <Text style={[styles.sectionTitle, { color: theme.title }]}>
-          Income Categories
-        </Text>
-        <View style={styles.categorySection}>
-          {incomeCategories.map((item, index) => (
-            <Category
-              key={index}
-              name={item.name}
-              iconIndex={index}
-              icon={item.icon}
-              onPress={() => handleCategorySelect(item)}
-              isSelected={checkIfSelectedCategory(item)}
-            />
-          ))}
-        </View>
-      </ScrollView>
-
-      {/* input section */}
-      {isCategorySelected && (
-        <View style={[styles.amount, { backgroundColor: theme.inputBg }]}>
-          <TextInput
-            style={[styles.amountInput, { backgroundColor: theme.input }]}
-            placeholder="0.00"
-            keyboardType="numeric"
-            onChangeText={setAmountValue}
-          />
-          <TextInput
-            style={[
-              styles.amountDescription,
-              { backgroundColor: theme.input, color: theme.text },
-            ]}
-            placeholder="Description"
-            onChangeText={setDescriptionValue}
-          />
-          <TouchableOpacity
-            style={[
-              styles.submitButton,
-              { backgroundColor: theme.buttonColor },
-            ]}
-            onPress={handleSubmit}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={80}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.main}>
+          <ScrollView
+            style={[styles.categories, { backgroundColor: theme.background }]}
+            contentContainerStyle={{ paddingBottom: 180 }}
           >
-            <Text style={[{ color: theme.buttonText }]}>Add</Text>
-          </TouchableOpacity>
+            <Text style={[styles.sectionTitle, { color: theme.title }]}>
+              Expense Categories
+            </Text>
+            <View style={styles.categorySection}>
+              {expenseCategories.map((item, index) => (
+                <Category
+                  key={index}
+                  name={item.name}
+                  iconIndex={index}
+                  icon={item.icon}
+                  onPress={() => handleCategorySelect(item)}
+                  isSelected={checkIfSelectedCategory(item)}
+                />
+              ))}
+            </View>
+
+            <Text style={[styles.sectionTitle, { color: theme.title }]}>
+              Income Categories
+            </Text>
+            <View style={styles.categorySection}>
+              {incomeCategories.map((item, index) => (
+                <Category
+                  key={index}
+                  name={item.name}
+                  iconIndex={index}
+                  icon={item.icon}
+                  onPress={() => handleCategorySelect(item)}
+                  isSelected={checkIfSelectedCategory(item)}
+                />
+              ))}
+            </View>
+          </ScrollView>
+
+          {isCategorySelected && (
+            <View style={[styles.amount, { backgroundColor: theme.inputBg }]}>
+              <TextInput
+                style={[
+                  styles.amountInput,
+                  { backgroundColor: Colors.white, color: Colors.black },
+                ]}
+                placeholder="0.00"
+                placeholderTextColor={Colors.black}
+                keyboardType="numeric"
+                onChangeText={setAmountValue}
+              />
+              <TextInput
+                style={[
+                  styles.amountDescription,
+                  { backgroundColor: Colors.white, color: Colors.black },
+                ]}
+                placeholder="Description"
+                placeholderTextColor={Colors.black}
+                onChangeText={setDescriptionValue}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.submitButton,
+                  { backgroundColor: theme.buttonColor },
+                ]}
+                onPress={handleSubmit}
+              >
+                <Text style={[{ color: theme.buttonText }]}>Add</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      )}
-    </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -181,26 +198,25 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 16,
   },
-  categoryText: {
-    marginTop: 8,
-    fontSize: 14,
-    color: "#333",
-  },
   amount: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingVertical: 10,
     flexDirection: "column",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 5,
   },
-
   amountInput: {
     paddingHorizontal: 16,
     margin: 10,
     borderRadius: 20,
+    textAlign: "right",
   },
   amountDescription: {
     paddingHorizontal: 16,

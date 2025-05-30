@@ -14,7 +14,7 @@ const TabLayout = () => {
         tabBarStyle: {
           backgroundColor: theme.navBackground,
           paddingTop: 10,
-          height: 90,
+          height: 120,
         },
         headerStyle: {
           backgroundColor: theme.navBackground,
@@ -40,13 +40,15 @@ const TabLayout = () => {
       />
 
       <Tabs.Screen
-        name="charts"
+        name="reports"
         options={{
-          title: "Charts",
+          title: "Reports",
+          href: null,
+          headerShown: true,
           tabBarIcon: ({ focused }) => (
             <Ionicons
               size={24}
-              name={focused ? "pie-chart" : "pie-chart-outline"}
+              name={focused ? "bar-chart" : "bar-chart-outline"}
               color={focused ? theme.iconColorFocused : theme.iconColor}
             />
           ),
@@ -68,13 +70,15 @@ const TabLayout = () => {
       />
 
       <Tabs.Screen
-        name="reports"
+        name="charts"
         options={{
-          title: "Reports",
+          title: "Charts",
+          href: null,
+          headerShown: true,
           tabBarIcon: ({ focused }) => (
             <Ionicons
               size={24}
-              name={focused ? "bar-chart" : "bar-chart-outline"}
+              name={focused ? "pie-chart" : "pie-chart-outline"}
               color={focused ? theme.iconColorFocused : theme.iconColor}
             />
           ),
@@ -82,13 +86,15 @@ const TabLayout = () => {
       />
 
       <Tabs.Screen
-        name="accounts"
+        name="settings"
         options={{
-          title: "Accounts",
+          title: "Settings",
+          href: null,
+          headerShown: true,
           tabBarIcon: ({ focused }) => (
             <Ionicons
               size={24}
-              name={focused ? "person" : "person-outline"}
+              name={focused ? "settings" : "settings-outline"}
               color={focused ? theme.iconColorFocused : theme.iconColor}
             />
           ),
@@ -100,7 +106,7 @@ const TabLayout = () => {
         options={{
           href: null,
           headerShown: true,
-          title: "Update Record"
+          title: "Update Record",
         }}
       />
     </Tabs>
